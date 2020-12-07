@@ -31,7 +31,7 @@ func (f *xField) Init(name string, definition string, tag string) (bool, int) {
 	}
 
 	if name != "" {
-		f.Name = upperInitialChar(name)
+		f.Name = name
 		if f.ParentField == nil {
 			f.FullName = name
 		} else {
@@ -98,7 +98,7 @@ func (f *xField) ParseDatas(id int, datas []string) error {
 	f.ID = id
 	if f.ParentField != nil && f.ParentField.Type == "dict" && strings.TrimSpace(f.Name) == "" {
 		nameData := splitName(data)
-		f.Name = upperInitialChar(nameData[0])
+		f.Name = nameData[0]
 		f.FullName = f.ParentField.FullName + "." + f.Name
 		data = nameData[1]
 	}
