@@ -25,7 +25,7 @@ func (x *xlsx) Init(fileName string, name string) {
 func (x *xlsx) Parse(rows [][]string) {
 	x.Template = new(xField)
 	if ok, _ := x.Template.Init(x.Name, "struct", ""); ok {
-		x.Template.ParseSubFieldsDefs(rows[1], rows[2], rows[3])
+		x.Template.ParseSubFieldsDefs(rows[0], rows[1], rows[2])
 		for i := 4; i < len(rows); i++ {
 			field := x.Template.Copy()
 

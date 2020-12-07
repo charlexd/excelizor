@@ -96,14 +96,13 @@ func loadFile(path string, f os.FileInfo, err error) error {
 }
 
 func parseFile(fileName string, file *excelize.File) *xlsx {
-	var data [][]string
 	sheetName := file.GetSheetName(1)
 
+	data, _ := file.GetRows(sheetName)
 	if sheetName == "Vertical" {
-		data = convertToVertical(file.GetRows(sheetName))
-	} else {
-		data = file.GetRows(sheetName)
+		data = convertToVertical(data)
 	}
+
 	x := new(xlsx)
 
 	lower, camel := name2lower2Camel(fileName)
