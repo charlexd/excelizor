@@ -50,8 +50,8 @@ func main() {
 		params.cshapPath = "./exports/"
 		params.golangPath = "./exports/"
 	} else if params.excelSrc == "" || (params.luaPath == "" && params.jsonPath == "" && params.cshapPath == "" && params.golangPath == "") || flag.Arg(0) == "help" {
-		fmt.Println("Usage: excelizor -p <path> [-lua=<luaExportPath>] [-json=<jsonExportPath>] [-csharp=<csharpExportPath>] [-golang=<golangExportPath>] [-tag=<tag>] ")
-		fmt.Println("       excelizor (help|test)")
+		fmt.Println("Usage: xlsxporter -p <path> [-lua=<luaExportPath>] [-json=<jsonExportPath>] [-csharp=<csharpExportPath>] [-golang=<golangExportPath>] [-tag=<tag>] ")
+		fmt.Println("       xlsxporter (help|test)")
 		flag.PrintDefaults()
 		return
 	}
