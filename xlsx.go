@@ -22,13 +22,29 @@ func (x *xlsx) Init(fileName string, name string) {
 	x.keymap = make(map[int]*xField)
 }
 
+func PrintStringArray (row []string) {
+	print("\t")
+	for i := 0; i < len(row); i++ {
+		fmt.Printf("[%d]%s, ", i, row[i])
+	}
+	println()
+}
+
 func (x *xlsx) Parse(rows [][]string) {
 	x.Template = new(xField)
 	if ok, _ := x.Template.Init(x.Name, "struct", ""); ok {
+
+		fmt.Printf("\n---------- FieldName:\n")
+		PrintStringArray(rows[0])
+		fmt.Printf("---------- FieldType:\n")
+		PrintStringArray(rows[1])
+		fmt.Printf("---------- Tag:\n")
+		PrintStringArray(rows[2])
+
 		x.Template.ParseSubFieldsDefs(rows[0], rows[1], rows[2])
 		for i := 4; i < len(rows); i++ {
 			field := x.Template.Copy()
-
+			//PrintStringArray(rows[i])
 			// comment row
 			if strings.HasPrefix(rows[i][0], "//") || rows[i][0] == "" {
 				continue

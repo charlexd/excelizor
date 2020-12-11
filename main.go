@@ -64,14 +64,12 @@ func main() {
 	}
 
 	for key, value := range loadedFiles {
-		output := "Parse and export file [ " + key + " ] "
-		fmt.Print(output)
-		for i := 0; i < 60-len(output); i++ {
-			fmt.Print(".")
-		}
+		fmt.Print("============================================================\n")
+		fmt.Printf("Parse and export file [ %s ] ", key)
+
 		value.xl = parseFile(key, value.file)
 		exportFile(value.xl)
-		fmt.Print(" Success!\n")
+		fmt.Print("Success!\n\n")
 	}
 
 	//x.Print()
