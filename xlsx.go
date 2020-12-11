@@ -46,7 +46,7 @@ func (x *xlsx) Parse(rows [][]string) {
 			field := x.Template.Copy()
 			//PrintStringArray(rows[i])
 			// comment row
-			if strings.HasPrefix(rows[i][0], "//") || rows[i][0] == "" {
+			if len(rows[i]) == 0 || strings.HasPrefix(rows[i][0], "//") || rows[i][0] == "" {
 				continue
 			}
 			id, _ := strconv.Atoi(rows[i][0])
