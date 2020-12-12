@@ -69,7 +69,7 @@ func main() {
 
 		value.xl = parseFile(key, value.file)
 		exportFile(value.xl)
-		fmt.Print("Success!\n\n")
+		fmt.Printf("Success! [ %s ] - < %s >\n\n", key, value.xl.SheetName)
 	}
 
 	//x.Print()
@@ -96,12 +96,13 @@ func loadFile(path string, f os.FileInfo, err error) error {
 func parseFile(fileName string, file *excelize.File) *xlsx {
 	sheetName := file.GetSheetName(1)
 
-	data, _ := file.GetRows(sheetName)
+	data := file.GetRows(sheetName)
 	if sheetName == "Vertical" {
 		data = convertToVertical(data)
 	}
 
 	x := new(xlsx)
+	x.SheetName = sheetName
 
 	lower, camel := name2lower2Camel(fileName)
 	x.Init(lower, camel)

@@ -10,6 +10,8 @@ import (
 type xlsx struct {
 	Name     string
 	FileName string
+	ClassName string
+	SheetName string
 	Template *xField
 	Data     []*xField
 	keymap   map[int]*xField
@@ -31,20 +33,31 @@ func PrintStringArray (row []string) {
 }
 
 func (x *xlsx) Parse(rows [][]string) {
+	if len(rows) < 3 {
+		log.Fatalln("Parse", x.Name, "header rows < 3")
+		return
+	}
+	if len(rows[2]) < 1 {
+		log.Fatalln("Parse", x.Name, "header need ClassName in row[2][0]")
+		return
+	}
+
+	x.ClassName = rows[2][0]
+	rows[2][0] = ""
+
 	x.Template = new(xField)
+	fmt.Printf("\n---------- FieldName:\n")
+	PrintStringArray(rows[0])
+	fmt.Printf("---------- FieldType:\n")
+	PrintStringArray(rows[1])
+	fmt.Printf("---------- Tag:\n")
+	PrintStringArray(rows[2])
+
 	if ok, _ := x.Template.Init(x.Name, "struct", ""); ok {
-
-		fmt.Printf("\n---------- FieldName:\n")
-		PrintStringArray(rows[0])
-		fmt.Printf("---------- FieldType:\n")
-		PrintStringArray(rows[1])
-		fmt.Printf("---------- Tag:\n")
-		PrintStringArray(rows[2])
-
 		x.Template.ParseSubFieldsDefs(rows[0], rows[1], rows[2])
 		for i := 4; i < len(rows); i++ {
 			field := x.Template.Copy()
-			//PrintStringArray(rows[i])
+			// PrintStringArray(rows[i])
 			// comment row
 			if len(rows[i]) == 0 || strings.HasPrefix(rows[i][0], "//") || rows[i][0] == "" {
 				continue
