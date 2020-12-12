@@ -12,6 +12,7 @@ import (
 
 type parameters struct {
 	excelSrc   string
+	excelOne   string
 	luaPath    string
 	jsonPath   string
 	cshapPath  string
@@ -31,6 +32,7 @@ var loadedFiles map[string]*fileXlsx
 func init() {
 	params = new(parameters)
 	flag.StringVar(&params.excelSrc, "p", "", "[Required] Relative `path` of excel files folder")
+	flag.StringVar(&params.excelOne, "f", "", "[Required] Relative `file` of one excel file")
 
 	flag.StringVar(&params.tag, "tag", "", "only field with this tag or empty string will be exported")
 	flag.StringVar(&params.luaPath, "lua", "", "path to place exported .lua files, export no .lua files if parameter is missing")
@@ -49,7 +51,7 @@ func main() {
 		params.jsonPath = "./exports/"
 		params.cshapPath = "./exports/"
 		params.golangPath = "./exports/"
-	} else if params.excelSrc == "" || (params.luaPath == "" && params.jsonPath == "" && params.cshapPath == "" && params.golangPath == "") || flag.Arg(0) == "help" {
+	} else if (params.excelSrc == "" && params.excelOne == "") || (params.luaPath == "" && params.jsonPath == "" && params.cshapPath == "" && params.golangPath == "") || flag.Arg(0) == "help" {
 		fmt.Println("Usage: xlsxporter -p <path> [-lua=<luaExportPath>] [-json=<jsonExportPath>] [-csharp=<csharpExportPath>] [-golang=<golangExportPath>] [-tag=<tag>] ")
 		fmt.Println("       xlsxporter (help|test)")
 		flag.PrintDefaults()
@@ -58,9 +60,18 @@ func main() {
 
 	loadedFiles = make(map[string]*fileXlsx)
 
-	err := filepath.Walk(params.excelSrc, loadFile)
-	if err != nil {
-		log.Fatalln(err)
+	if params.excelSrc != "" {
+		err := filepath.Walk(params.excelSrc, loadFile)
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+	if params.excelOne != "" {
+		xl, err := excelize.OpenFile(params.excelOne)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		loadedFiles[filepath.Base(params.excelOne)] = &fileXlsx{xl, nil}
 	}
 
 	for key, value := range loadedFiles {
