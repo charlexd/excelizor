@@ -21,11 +21,11 @@ type exporter struct {
 	golangTemplate   []byte
 }
 
-func (e *exporter) Init() {
-	e.luaTableTemplate, _ = ioutil.ReadFile("templates/lua.tmpl")
-	e.jsonTemplate, _ = ioutil.ReadFile("templates/json.tmpl")
-	e.csharpTemplate, _ = ioutil.ReadFile("templates/csharp.tmpl")
-	e.golangTemplate, _ = ioutil.ReadFile("templates/golang.tmpl")
+func (e *exporter) Init(tpsPath string) {
+	e.luaTableTemplate, _ = ioutil.ReadFile(tpsPath + "/lua.tmpl")
+	e.jsonTemplate, _ = ioutil.ReadFile(tpsPath + "/json.tmpl")
+	e.csharpTemplate, _ = ioutil.ReadFile(tpsPath + "/csharp.tmpl")
+	e.golangTemplate, _ = ioutil.ReadFile(tpsPath + "/golang.tmpl")
 
 	initCsharpTypeNames()
 	initGolangTypeNames()

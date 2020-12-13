@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
 )
@@ -13,6 +14,7 @@ import (
 type parameters struct {
 	excelSrc   string
 	excelOne   string
+	tpsPath    string
 	luaPath    string
 	jsonPath   string
 	cshapPath  string
@@ -33,6 +35,7 @@ func init() {
 	params = new(parameters)
 	flag.StringVar(&params.excelSrc, "p", "", "[Required] Relative `path` of excel files folder")
 	flag.StringVar(&params.excelOne, "f", "", "[Required] Relative `file` of one excel file")
+	flag.StringVar(&params.tpsPath, "m", "templates", "path to templates")
 
 	flag.StringVar(&params.tag, "tag", "", "only field with this tag or empty string will be exported")
 	flag.StringVar(&params.luaPath, "lua", "", "path to place exported .lua files, export no .lua files if parameter is missing")
@@ -110,6 +113,12 @@ func parseFile(fileName string, file *excelize.File) *xlsx {
 	data := file.GetRows(sheetName)
 	if sheetName == "Vertical" {
 		data = convertToVertical(data)
+
+	}
+	// use | for vertical sheet
+	if strings.HasPrefix(sheetName, "|") {
+		data = convertToVertical(data)
+		sheetName = strings.TrimPrefix(sheetName, "|")
 	}
 
 	x := new(xlsx)
@@ -123,7 +132,7 @@ func parseFile(fileName string, file *excelize.File) *xlsx {
 
 func exportFile(x *xlsx) {
 	e := new(exporter)
-	e.Init()
+	e.Init(params.tpsPath)
 
 	if params.luaPath != "" {
 		e.ExportLua(params.luaPath, x)
@@ -139,6 +148,5 @@ func exportFile(x *xlsx) {
 	}
 	if params.golangPath != "" {
 		e.ExportGolang(params.golangPath, x)
-
 	}
 }
