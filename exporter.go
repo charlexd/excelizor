@@ -37,7 +37,7 @@ func (e *exporter) ExportLua(folder string, xl *xlsx) {
 		panic(err)
 	}
 
-	newFile, err := os.Create(path.Join(folder, xl.FileName+".lua"))
+	newFile, err := os.Create(path.Join(folder, xl.ClassName+"Table.cs"))
 	defer newFile.Close()
 	if err != nil {
 		log.Fatal(err)
@@ -55,7 +55,7 @@ func (e *exporter) ExportJSON(folder string, xl *xlsx) {
 		panic(err)
 	}
 
-	newFile, err := os.Create(path.Join(folder, xl.FileName+".json"))
+	newFile, err := os.Create(path.Join(folder, xl.FileName+"."+xl.SheetName+".json"))
 	defer newFile.Close()
 	if err != nil {
 		log.Fatal(err)
@@ -73,7 +73,7 @@ func (e *exporter) ExportCSharp(folder string, xl *xlsx) {
 		panic(err)
 	}
 
-	newFile, err := os.Create(path.Join(folder, xl.Name+".cs"))
+	newFile, err := os.Create(path.Join(folder, xl.ClassName+".cs"))
 	defer newFile.Close()
 	if err != nil {
 		log.Fatal(err)
