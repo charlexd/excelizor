@@ -32,26 +32,28 @@ func PrintStringArray (row []string) {
 	println()
 }
 
-func (x *xlsx) Parse(rows [][]string) {
+func (x *xlsx) Parse(rows [][]string) bool {
 	if len(rows) < 3 {
 		log.Fatalln("Parse", x.Name, "header rows < 3")
-		return
+		return false
 	}
 	if len(rows[2]) < 1 {
-		log.Fatalln("Parse", x.Name, "header need ClassName in row[2][0]")
-		return
+		log.Println("Parse", x.Name, "header need ClassName in row[2][0]")
+		return false
 	}
 
 	x.ClassName = rows[2][0]
 	rows[2][0] = ""
 
+	fmt.Println()
 	x.Template = new(xField)
-	fmt.Printf("\n---------- FieldName:\n")
+	fmt.Printf("---------- FieldName:\n")
 	PrintStringArray(rows[0])
 	fmt.Printf("---------- FieldType:\n")
 	PrintStringArray(rows[1])
 	fmt.Printf("---------- Tag:\n")
 	PrintStringArray(rows[2])
+	fmt.Println()
 
 	if ok, _ := x.Template.Init(x.Name, "struct", ""); ok {
 		x.Template.ParseSubFieldsDefs(rows[0], rows[1], rows[2])
@@ -85,6 +87,8 @@ func (x *xlsx) Parse(rows [][]string) {
 	} else {
 		log.Fatalln("Parse", x.Name, "head field")
 	}
+
+	return true
 }
 
 func (x *xlsx) Print() {

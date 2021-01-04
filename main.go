@@ -79,11 +79,11 @@ func main() {
 
 	for key, value := range loadedFiles {
 		fmt.Print("============================================================\n")
-		fmt.Printf("Parse and export file [ %s ] ", key)
+		fmt.Printf("Parse and export file [ %s ]\n", key)
 
 		value.xl = parseFile(key, value.file)
-		exportFile(value.xl)
-		fmt.Printf("Success! [ %s ] - < %s >\n\n", key, value.xl.SheetName)
+
+		fmt.Printf("\nSuccess! [ %s ]\n\n", key)
 	}
 
 	//x.Print()
@@ -108,26 +108,52 @@ func loadFile(path string, f os.FileInfo, err error) error {
 }
 
 func parseFile(fileName string, file *excelize.File) *xlsx {
-	sheetName := file.GetSheetName(1)
+	sheetMap := file.GetSheetMap()
+	for sheetIndex, sheetName := range sheetMap {
+		fmt.Println(">>--------------------------------------------------")
+		if strings.HasPrefix(sheetName, "!") {
+			fmt.Printf(">> Table < %s[%s] > ignored!\n", fileName, sheetName)
+			continue
+		}
 
-	data := file.GetRows(sheetName)
-	if sheetName == "Vertical" {
-		data = convertToVertical(data)
+		if sheetIndex > 1 {
+			if !strings.HasPrefix(sheetName, "|") && !strings.HasPrefix(sheetName, "-") {
+				// 默认导入第一个sheet，之后的sheet必须配置导入前缀
+				fmt.Printf(">> Table < %s[%s] > ignored!\n", fileName, sheetName)
+				continue
+			}
+		}
 
+		data, _ := file.GetRows(sheetName)
+		if sheetName == "Vertical" {
+			data = convertToVertical(data)
+		}
+		// use | for vertical sheet
+		if strings.HasPrefix(sheetName, "|") {
+			data = convertToVertical(data)
+			sheetName = strings.TrimPrefix(sheetName, "|")
+		}
+
+		if strings.HasPrefix(sheetName, "-") {
+			sheetName = strings.TrimPrefix(sheetName, "-")
+		}
+
+		fmt.Printf(">> Table < %s[%s] > start!\n", fileName, sheetName)
+
+		x := new(xlsx)
+		x.SheetName = sheetName
+
+		lower, camel := name2lower2Camel(fileName)
+		x.Init(lower, camel)
+
+		if !x.Parse(data) {
+			fmt.Printf(">> Table < %s[%s] > ignored!\n", fileName, sheetName)
+			continue
+		}
+		exportFile(x)
+		fmt.Printf(">> Table < %s[%s] =>> %s > done!\n", fileName, sheetName, x.ClassName)
 	}
-	// use | for vertical sheet
-	if strings.HasPrefix(sheetName, "|") {
-		data = convertToVertical(data)
-		sheetName = strings.TrimPrefix(sheetName, "|")
-	}
-
-	x := new(xlsx)
-	x.SheetName = sheetName
-
-	lower, camel := name2lower2Camel(fileName)
-	x.Init(lower, camel)
-	x.Parse(data)
-	return x
+	return nil
 }
 
 func exportFile(x *xlsx) {
