@@ -74,29 +74,34 @@ func splitSubData(layer int, data string) []string {
 	return subDatas
 }
 
-func handleData(dataType string, data string) (string, error) {
-	var result string
+// 根据类型处理基础类型数据
+func handleData(dataField *xField, data string) (error) {
 	var retErr error
-	switch dataType {
+	if dataField.HasDefaultData && len(strings.TrimSpace(data)) == 0 {
+		// 定义了默认值的空字段使用默认值
+		retErr = nil
+		return retErr
+	}
+	switch dataField.Type {
 	case "int":
 		ret, err := strconv.Atoi(data)
-		result = strconv.Itoa(ret)
+		dataField.Data = strconv.Itoa(ret)
 		retErr = err
 	case "float":
 		ret, err := strconv.ParseFloat(data, 32)
-		result = strconv.FormatFloat(ret, 'f', 3, 32)
+		dataField.Data = strconv.FormatFloat(ret, 'f', 3, 32)
 		retErr = err
 	case "bool":
 		ret, err := strconv.ParseBool(data)
-		result = strconv.FormatBool(ret)
+		dataField.Data = strconv.FormatBool(ret)
 		retErr = err
 	case "string":
-		result = data
+		dataField.Data = data
 		retErr = nil
 	default:
-		retErr = errors.New("DataType " + dataType + " is invalid for data " + data)
+		retErr = errors.New("DataType " + dataField.Type + " is invalid for data " + data)
 	}
-	return result, retErr
+	return retErr
 }
 
 func name2lower2Camel(name string) (string, string) {

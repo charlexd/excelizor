@@ -23,8 +23,10 @@ type xField struct {
 	Template    *xField
 	Fields      []*xField
 	ParentField *xField
+	HasDefaultData 	bool
 }
 
+// 初始化单个字段定义
 func (f *xField) Init(name string, definition string, tag string) (bool, int) {
 	if name == "" && definition == "" && f.Name == "" && f.Type == "" {
 		return false, -1
@@ -84,6 +86,7 @@ func (f *xField) ParseSubFieldsDefs(names []string, defs []string, tags []string
 	}
 }
 
+// 解析一条数据
 func (f *xField) ParseDatas(id int, datas []string) error {
 	data := strings.TrimSpace(datas[0])
 	if strings.ToLower(data) == "nil" || strings.ToLower(data) == "null" {
@@ -104,18 +107,20 @@ func (f *xField) ParseDatas(id int, datas []string) error {
 	}
 
 	if f.Count == 0 {
+		// 单表格嵌套数据
 		data = trimData(data)
 		subDatas := splitSubData(f.Layer, data)
 
 		f.setSubFieldsData(subDatas)
 	} else if f.Count == 1 {
-		if result, err := handleData(f.Type, data); err == nil {
-			f.Data = result
+		// 单表格基础类型数据
+		if err := handleData(f, data); err == nil {
 			f.Data = strings.Replace(f.Data, "\"", "\\\"", -1)
 		} else {
 			log.Fatalln("[", err, "] in field", f.FullName, "of data id", f.ID)
 		}
 	} else {
+		// 多表格嵌套数据
 		f.setSubFieldsData(datas)
 	}
 	return nil
@@ -155,6 +160,7 @@ func (f *xField) setSubFieldsData(data []string) {
 	}
 }
 
+// 解析字段的类型定义
 func (f *xField) parseDefinition(def string, tag string) (bool, string) {
 	first := strings.Index(def, "<")
 	last := strings.LastIndex(def, ">:")
@@ -168,8 +174,25 @@ func (f *xField) parseDefinition(def string, tag string) (bool, string) {
 		return true, def[first+1 : last]
 	}
 
-	f.Type = def
-	f.LongType = def
+	// 处理基础类型的默认值
+	f.HasDefaultData = false
+	first = strings.Index(def, ",")
+	if first != -1 {
+		// 配置了默认值
+		f.Type = strings.TrimSpace(def[:first])
+		err := handleData(f, def[first+1:])
+		if err != nil {
+			log.Fatalln("[", err, "] in field", f.FullName, "of default value")
+			return false, ""
+		}
+		log.Println("[", f.Data, "] in field", f.FullName, "of default value")
+		f.HasDefaultData = true
+		f.LongType = f.Type
+	} else {
+		f.Type = strings.TrimSpace(def)
+		f.LongType = f.Type
+	}
+
 	f.Count = 1
 	f.Size = 1
 	f.Tag = tag
@@ -197,6 +220,7 @@ func (f *xField) Copy() *xField {
 	field.Layer = f.Layer
 	field.Level = f.Level
 	field.ParentField = f.ParentField
+	field.HasDefaultData = f.HasDefaultData
 	if f.Template != nil {
 		field.Template = f.Template.Copy()
 	}
