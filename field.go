@@ -9,21 +9,21 @@ import (
 )
 
 type xField struct {
-	ID          int
-	Name        string
-	FullName    string
-	Type        string
-	LongType    string
-	Tag         string
-	Data        string
-	Count       int
-	Size        int
-	Layer       int
-	Level       int
-	Template    *xField
-	Fields      []*xField
-	ParentField *xField
-	HasDefaultData 	bool
+	ID             int
+	Name           string
+	FullName       string
+	Type           string
+	LongType       string
+	Tag            string
+	Data           string
+	Count          int
+	Size           int
+	Layer          int
+	Level          int
+	Template       *xField
+	Fields         []*xField
+	ParentField    *xField
+	HasDefaultData bool
 }
 
 // 是否自定义类型
@@ -72,7 +72,7 @@ func (f *xField) ParseSubFieldsDefs(names []string, defs []string, tags []string
 	for i := 0; i < len(names); {
 		subFieldName := names[i]
 		// # 作为结尾
-		if strings.HasPrefix(strings.TrimSpace(subFieldName),"#") {
+		if strings.HasPrefix(strings.TrimSpace(subFieldName), "#") {
 			break
 		}
 		if f.Template == nil {

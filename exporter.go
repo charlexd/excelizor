@@ -126,7 +126,7 @@ func parseCsharpType(longType string) string {
 	if csharpTypeNames[longType] != "" {
 		return csharpTypeNames[longType]
 	}
-	if strings.HasPrefix(longType,"PB") || strings.HasSuffix(longType, "E") {
+	if strings.HasPrefix(longType, "PB") || strings.HasSuffix(longType, "E") {
 		return longType
 	}
 	first := strings.Index(longType, "<")

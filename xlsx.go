@@ -8,13 +8,13 @@ import (
 )
 
 type xlsx struct {
-	Name     string
-	FileName string
+	Name      string
+	FileName  string
 	ClassName string
 	SheetName string
-	Template *xField
-	Data     []*xField
-	keymap   map[int]*xField
+	Template  *xField
+	Data      []*xField
+	keymap    map[int]*xField
 }
 
 func (x *xlsx) Init(fileName string, name string) {
@@ -24,7 +24,7 @@ func (x *xlsx) Init(fileName string, name string) {
 	x.keymap = make(map[int]*xField)
 }
 
-func PrintStringArray (row []string) {
+func PrintStringArray(row []string) {
 	print("\t")
 	for i := 0; i < len(row); i++ {
 		fmt.Printf("[%d]%s, ", i, row[i])
@@ -45,7 +45,6 @@ func (x *xlsx) Parse(rows [][]string) bool {
 
 	x.ClassName = rows[2][0]
 	rows[2][0] = ""
-
 
 	fmt.Println()
 	x.Template = new(xField)
