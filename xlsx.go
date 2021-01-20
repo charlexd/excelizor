@@ -32,6 +32,7 @@ func PrintStringArray (row []string) {
 	println()
 }
 
+// 解析Sheet表格数据
 func (x *xlsx) Parse(rows [][]string) bool {
 	if len(rows) < 3 {
 		log.Fatalln("Parse", x.Name, "header rows < 3")
@@ -44,6 +45,7 @@ func (x *xlsx) Parse(rows [][]string) bool {
 
 	x.ClassName = rows[2][0]
 	rows[2][0] = ""
+
 
 	fmt.Println()
 	x.Template = new(xField)

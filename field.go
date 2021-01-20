@@ -26,6 +26,15 @@ type xField struct {
 	HasDefaultData 	bool
 }
 
+// 是否自定义类型
+func (f *xField) IsCustomType() bool {
+	return strings.HasPrefix(f.Type, "PB") || strings.HasPrefix(f.Type, "E")
+}
+
+func (f *xField) IsEnum() bool {
+	return strings.HasPrefix(f.Type, "E")
+}
+
 // 初始化单个字段定义
 func (f *xField) Init(name string, definition string, tag string) (bool, int) {
 	if name == "" && definition == "" && f.Name == "" && f.Type == "" {
@@ -61,13 +70,18 @@ func (f *xField) Init(name string, definition string, tag string) (bool, int) {
 func (f *xField) ParseSubFieldsDefs(names []string, defs []string, tags []string) {
 	subFieldIndex := 1
 	for i := 0; i < len(names); {
+		subFieldName := names[i]
+		// # 作为结尾
+		if strings.HasPrefix(strings.TrimSpace(subFieldName),"#") {
+			break
+		}
 		if f.Template == nil {
 			f.Template = new(xField)
 			f.Template.Size = 1
 		}
 		f.Template.ParentField = f
 		field := f.Template.Copy()
-		subFieldName := names[i]
+
 		if f.Type == "list" {
 			subFieldName = strconv.Itoa(subFieldIndex)
 		}
@@ -115,7 +129,7 @@ func (f *xField) ParseDatas(id int, datas []string) error {
 	} else if f.Count == 1 {
 		// 单表格基础类型数据
 		if err := handleData(f, data); err == nil {
-			f.Data = strings.Replace(f.Data, "\"", "\\\"", -1)
+
 		} else {
 			log.Fatalln("[", err, "] in field", f.FullName, "of data id", f.ID)
 		}
@@ -180,6 +194,7 @@ func (f *xField) parseDefinition(def string, tag string) (bool, string) {
 	if first != -1 {
 		// 配置了默认值
 		f.Type = strings.TrimSpace(def[:first])
+		// 读取默认值
 		err := handleData(f, def[first+1:])
 		if err != nil {
 			log.Fatalln("[", err, "] in field", f.FullName, "of default value")

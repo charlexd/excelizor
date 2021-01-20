@@ -146,6 +146,7 @@ func parseFile(fileName string, file *excelize.File) *xlsx {
 		lower, camel := name2lower2Camel(fileName)
 		x.Init(lower, camel)
 
+		// 解析当前sheet
 		if !x.Parse(data) {
 			fmt.Printf(">> Table < %s[%s] > ignored!\n", fileName, sheetName)
 			continue

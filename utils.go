@@ -75,12 +75,24 @@ func splitSubData(layer int, data string) []string {
 }
 
 // 根据类型处理基础类型数据
-func handleData(dataField *xField, data string) (error) {
+func handleData(dataField *xField, data string) error {
 	var retErr error
 	if dataField.HasDefaultData && len(strings.TrimSpace(data)) == 0 {
 		// 定义了默认值的空字段使用默认值
 		retErr = nil
 		return retErr
+	}
+	// 处理枚举和自定义类型的解析方式
+	if dataField.IsCustomType() {
+		if dataField.IsEnum() {
+			// 枚举整型处理
+			dataField.Type = "int"
+		} else {
+			// 自定义结构体，保留原始数据
+			dataField.Data = data
+			retErr = nil
+			return retErr
+		}
 	}
 	switch dataField.Type {
 	case "int":
@@ -96,7 +108,8 @@ func handleData(dataField *xField, data string) (error) {
 		dataField.Data = strconv.FormatBool(ret)
 		retErr = err
 	case "string":
-		dataField.Data = data
+		// 字符串基础类型需要转义引号
+		dataField.Data = strings.Replace(data, "\"", "\\\"", -1)
 		retErr = nil
 	default:
 		retErr = errors.New("DataType " + dataField.Type + " is invalid for data " + data)
