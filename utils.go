@@ -82,11 +82,17 @@ func handleData(dataField *xField, data string) error {
 		retErr = nil
 		return retErr
 	}
+	handleType := dataField.Type
 	// 处理枚举和自定义类型的解析方式
 	if dataField.IsCustomType() {
 		if dataField.IsEnum() {
-			// 枚举整型处理
-			dataField.Type = "int"
+			// 枚举按整型处理
+			handleType = "int"
+			// 数据支持以#开始的注释
+			first := strings.Index(data, "#")
+			if first != -1 {
+				data = data[:first]
+			}
 		} else {
 			// 自定义结构体，保留原始数据
 			dataField.Data = data
@@ -94,7 +100,7 @@ func handleData(dataField *xField, data string) error {
 			return retErr
 		}
 	}
-	switch dataField.Type {
+	switch handleType {
 	case "int":
 		ret, err := strconv.Atoi(data)
 		dataField.Data = strconv.Itoa(ret)
