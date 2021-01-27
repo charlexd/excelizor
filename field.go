@@ -122,7 +122,7 @@ func (f *xField) ParseDatas(id int, datas []string) error {
 
 	if f.Count == 0 {
 		// 单表格嵌套数据
-		data = trimData(data)
+		data = strings.TrimSpace(data)
 		subDatas := splitSubData(f.Layer, data)
 
 		f.setSubFieldsData(subDatas)
