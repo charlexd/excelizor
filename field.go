@@ -14,6 +14,7 @@ type xField struct {
 	FullName       string
 	Type           string
 	LongType       string
+	ElementType    string
 	Tag            string
 	Data           string
 	Count          int
@@ -181,12 +182,13 @@ func (f *xField) parseDefinition(def string, tag string) (bool, string) {
 	if first != -1 && last != -1 {
 		// list,dict类型
 		if count, err := strconv.Atoi(def[last+2:]); err == nil {
-			f.Type = def[:first]      //list,dcit
-			f.LongType = def[:last+1] //list<XX>,dict<XX>
+			f.Type = def[:first]                //list,dcit
+			f.LongType = def[:last+1]           //list<XX>,dict<XX>
+			f.ElementType = def[first+1 : last] //XX
 			f.Count = count
 			f.Tag = tag
 		}
-		return true, def[first+1 : last] // XX
+		return true, f.ElementType // XX
 	}
 
 	// 处理基础类型的默认值
@@ -203,14 +205,17 @@ func (f *xField) parseDefinition(def string, tag string) (bool, string) {
 		}
 		log.Println("[", f.Data, "] in field", f.FullName, "of default value")
 		f.HasDefaultData = true
-		f.LongType = f.Type
 	} else {
 		f.Type = strings.TrimSpace(def)
-		f.LongType = f.Type
 	}
+
+	f.LongType = f.Type
+	f.ElementType = "basic"
 
 	if strings.HasPrefix(f.Type, "E") {
 		f.LongType = "enum"
+	} else if strings.HasPrefix(f.Type, "PB") {
+		f.LongType = "class"
 	}
 
 	f.Count = 1
@@ -234,6 +239,7 @@ func (f *xField) Copy() *xField {
 	field.Tag = f.Tag
 	field.Type = f.Type
 	field.LongType = f.LongType
+	field.ElementType = f.ElementType
 	field.Data = f.Data
 	field.Count = f.Count
 	field.Size = f.Size
