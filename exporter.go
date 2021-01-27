@@ -112,6 +112,7 @@ func genericFuncMap() map[string]interface{} {
 		"GetCSharpTypeName": parseCsharpType,
 		"GetGolangTypeName": parseGolangType,
 		"indent":            indent,
+		"HasPrefix":         strings.HasPrefix,
 	}
 
 	return genericMap
