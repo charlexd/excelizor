@@ -181,7 +181,7 @@ func (f *xField) parseDefinition(def string, tag string) (bool, string) {
 	if first != -1 && last != -1 {
 		// list,dict类型
 		if count, err := strconv.Atoi(def[last+2:]); err == nil {
-			f.Type = def[:first] //list,dcit
+			f.Type = def[:first]      //list,dcit
 			f.LongType = def[:last+1] //list<XX>,dict<XX>
 			f.Count = count
 			f.Tag = tag
