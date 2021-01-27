@@ -179,13 +179,14 @@ func (f *xField) parseDefinition(def string, tag string) (bool, string) {
 	first := strings.Index(def, "<")
 	last := strings.LastIndex(def, ">:")
 	if first != -1 && last != -1 {
+		// list,dict类型
 		if count, err := strconv.Atoi(def[last+2:]); err == nil {
-			f.Type = def[:first]
-			f.LongType = def[:last+1]
+			f.Type = def[:first] //list,dcit
+			f.LongType = def[:last+1] //list<XX>,dict<XX>
 			f.Count = count
 			f.Tag = tag
 		}
-		return true, def[first+1 : last]
+		return true, def[first+1 : last] // XX
 	}
 
 	// 处理基础类型的默认值
@@ -206,6 +207,10 @@ func (f *xField) parseDefinition(def string, tag string) (bool, string) {
 	} else {
 		f.Type = strings.TrimSpace(def)
 		f.LongType = f.Type
+	}
+
+	if strings.HasPrefix(f.Type, "E") {
+		f.LongType = "enum"
 	}
 
 	f.Count = 1
